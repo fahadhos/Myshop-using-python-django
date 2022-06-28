@@ -1,0 +1,205 @@
+{% extends 'shop/basic.html' %}
+{% block title %} Cart {% endblock %}
+
+
+{% block body %}
+{% load static %}
+<!-- Page Header Start -->
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Shopping Cart</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Shopping Cart</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+
+<!-- Cart Start -->
+<div class="container-fluid pt-5" >
+    <div class="row px-xl-5">
+        <div class="col-lg-8 table-responsive mb-5">
+
+            <table class="table table-bordered text-center mb-0">
+                <span id="comment"></span>
+                <thead class="bg-secondary text-dark">
+                    <tr>
+                        <th>Products</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle" id="items">
+                    <!--                     {% for i in product %}-->
+
+                    <tr>
+                        <td class="align-middle"><img src="" alt="" style="width: 50px;"> </td>
+                        <td class="align-middle">৳150</td>
+                        <td class="align-middle">
+                            <div class="input-group quantity mx-auto" style="width: 100px;">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-primary btn-minus">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control form-control-sm bg-secondary text-center"
+                                    value="1">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-primary btn-plus">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="align-middle"> </td>
+                        <td class="align-middle"><button onclick="" class="btn btn-sm btn-primary  ">
+                                <i class="fa fa-times"></i></button></td>
+                    </tr>
+                    <!--{% endfor %}-->
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-4">
+            <form class="mb-5" action="">
+                <div class="input-group">
+                    <input type="text" class="form-control p-4" placeholder="Coupon Code">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary">Apply Coupon</button>
+                    </div>
+                </div>
+            </form>
+            <div class="card border-secondary mb-5">
+                <div class="card-header bg-secondary border-0">
+                    <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3 pt-1">
+                        <h6 class="font-weight-medium">Subtotal</h6>
+                        <span style="left: 99px; position: relative">৳</span>
+                        <h6 class="font-weight-medium" id="price"></h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <h6 class="font-weight-medium">Shipping</h6>
+                        <span style="left: 99px; position: relative">৳</span>
+                        <h5 class="font-weight-bold" id="crg"> </h5>
+                    </div>
+                </div>
+                <div class="card-footer border-secondary bg-transparent">
+                    <div class="d-flex justify-content-between mt-2">
+                        <h5 class="font-weight-bold">Total</h5>
+                        <span style="left: 99px; position: relative">৳</span>
+                        <h5 class="font-weight-bold" id="total"> </h5>
+                    </div>
+                    <a href="/home/checkout/">
+                        <button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cart End -->
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    if (localStorage.getItem('cart') == null) {
+        var cart = {};
+
+    } else {
+        cart = JSON.parse(localStorage.getItem('cart'));
+       
+    }
+    console.log(cart);
+    var sum = 0;
+    var price = 0;
+    var iprice = 0;
+    var crg = 20;
+    var total = 0;
+    var loop_item_count = 0;
+    function updateCart(cart) {
+        loop_item_count++;
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+            document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary  minus'>-</button> <span  id='val" + item + "''>" + cart[item][0] + "</span> <button id='plus" + item + "' class='btn btn-primary  plus'> + </button>";
+
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        document.getElementById('cart').innerHTML = sum;
+        console.log(cart);
+
+    }
+
+    if ($.isEmptyObject(cart)) {
+        //if object is empty
+        mystr = `<div  class="alert alert-success" role="alert"><p>Your cart is empty, please add some items to your cart before checking out!</p> </div>`
+        $('#items').append(mystr);
+
+    }
+    else {
+        for (item in cart) {
+
+            let itemprice = cart[item][2];
+            let name = cart[item][1];
+            let qty = cart[item][0];
+            sum = sum + qty;
+            price = price + qty * itemprice;
+            iprice = qty * itemprice;
+            total = crg + price;
+
+            mystr = `<tr><td class="align-middle" ><img src="" alt="" style="width: 50px;">${name}</td>
+            <td class="align-middle"> ${itemprice}</td> <td class=" align-middle">${qty}</td>
+ <td class="align-middle">${iprice}</td>
+       <td class="align-middle"><button onclick="clearCart() " class="btn btn-sm btn-primary remove" data-name="${name}"style="border-radius: 10px;">
+       <i class="fa fa-times"></i></button></td>   </tr>`
+            $('#items').append(mystr);
+
+
+        }
+    }
+    document.getElementById('cart').innerHTML = sum;
+
+    document.getElementById('price').innerHTML = price;
+    document.getElementById('crg').innerHTML = crg;
+    document.getElementById('total').innerHTML = total;
+
+
+    function remove_item_more() {
+      if ($.isEmptyObject(cart)) {
+        //if object is empty
+        mystr = `<div style="width:800px" class="alert alert-success" role="alert"><p>Your cart is empty, please add some items to your cart before checking out!</p> </div>`
+        $('#items').append(mystr);
+
+    }
+        $('#items').on('click', '.remove', function () {
+            $(this).closest('tr').remove();
+
+
+            // remove the closest tr item row
+        });
+    }
+    function clearCart() {
+        cart = JSON.parse(localStorage.getItem('cart'));
+
+// <!--        for (var item in cart) {-->
+// <!--            document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary cart">Add To Cart</button>'-->
+// <!--        }-->
+remove_item_more();
+        localStorage.clear();
+        cart = {};
+        updateCart(cart);
+    }
+
+
+
+
+</script>
+{% endblock %}

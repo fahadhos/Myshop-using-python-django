@@ -1,10 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'shop/basic.html' %}
+{% block title %}  Contact Us {% endblock %}
+
+{% load static %}
+{% block body %}
+
+
+    <!-- Contact Start -->
+    <div class="container-fluid pt-5">
+        <h2></h2>
+
+</div>
+
+<div id="liveAlertPlaceholder"></div>
+
+        <div class="text-center mb-4">
+            <h2 class="section-title px-5"><span class="px-2">Contact For Any Queries</span></h2>
+        </div>
+        <div class="row px-xl-5">
+            <div class="col-lg-7 mb-5">
+                <div class="contact-form" >
+
+                    <div id="success"></div>
+                       <form name="sentMessage"  id="contactForm" novalidate="novalidate"
+                          action="#" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <div class="control-group">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Your Name"
+                                required="required" data-validation-required-message="Please enter your name" />
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Your Email"
+                                required="required" data-validation-required-message="Please enter your email" />
+                            <p class="help-block text-danger"></p>
+                        </div>
+                          <div class="control-group">
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Your phone number"
+                                required="" data-validation-required-message="Please enter a phone number" />
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject"
+                                required="required" data-validation-required-message="Please enter a subject" />
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            <textarea class="form-control" rows="6" id="message" name="message" placeholder="Message"
+                                required="required"
+                                data-validation-required-message="Please enter your message"></textarea>
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary py-2 px-4" type="submit"   id="liveAlertBtn">Send
+                                Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-5 mb-5">
+                <h5 class="font-weight-semi-bold mb-3">Get In Touch</h5>
+                <p> Thank you for contacting us.</p>
+                <div class="d-flex flex-column mb-3">
+                    <h5 class="font-weight-semi-bold mb-3">Store 1</h5>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Chittagong, Bangladesh</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
+                    <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>+880 1818 434560 </p>
+                </div>
+<!--                <div class="d-flex flex-column">-->
+<!--                    <h5 class="font-weight-semi-bold mb-3">Store 2</h5>-->
+<!--                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Chittagong, Bangladesh</p>-->
+<!--                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>-->
+<!--                    <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+880 1818 434560</p>-->
+<!--                </div>-->
+            </div>
+        </div>
+<!--    </div>-->
+    <!-- Contact End -->
+{% endblock %}
+{% block js %}
+<script>
+
+var alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+var alertTrigger = document.getElementById('liveAlertBtn')
+
+function alert(message, type) {
+  var wrapper = document.createElement('div')
+  wrapper.innerHTML = '<div style="width:900px" class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span></button></div>'
+
+  alertPlaceholder.append(wrapper)
+}
+
+if (alertTrigger) {
+  alertTrigger.addEventListener('click', function () {
+    alert('<strong>Hey there!</strong> We have received your message thank you!', 'success')
+  })
+}
+$(document).on('submit','#contactForm',function(e){
+  e.preventDefault();
+
+  $.ajax({
+
+  type: 'POST',
+  url: '/home/contact/',
+  data: {
+    name: $('#name').val(),
+    email: $('#email').val(),
+    phone: $('#phone').val(),
+    subject: $('#subject').val(),
+    message: $('#message').val(),
+    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+  },
+  success: function(data){
+
+    //  $('h2').html(data);
+
+  }
+  })
+});
+
+</script>
+
+
+
+
+{% endblock %}

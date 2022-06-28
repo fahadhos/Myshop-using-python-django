@@ -1,10 +1,170 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'shop/basic.html' %}
+{% block title %}Tracker{% endblock %}
+
+
+{% block body %}
+{% load static %}
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Tracker</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="/shop">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Tracker</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<form method="post" id="trackerForm" action="#" enctype="multipart/form-data">{% csrf_token %}
+    <!--  <div class="card-body">-->
+    <!--            <h6>Order ID: OD45345345435</h6>-->
+    <!--            <article class="card">-->
+    <!--                <div class="card-body row">-->
+    <!--                    <div class="col"> <strong>Estimated Delivery time:</strong> <br>29 nov 2019 </div>-->
+    <!--                    <div class="col"> <strong>Shipping BY:</strong> <br> BLUEDART, | <i class="fa fa-phone"></i> +1598675986 </div>-->
+    <!--                    <div class="col"> <strong>Status:</strong> <br>   Picked by the courier </div>-->
+    <!--                    <div class="col"> <strong>Tracking #:</strong> <br> BD045903594059 </div>-->
+    <!--                </div>-->
+    <!-- Tracker Start -->
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-8">
+                <div class="col-md-6 form-group">
+                    <label>Tracking Id</label>
+                    <input class="form-control" name="orderid" id="orderid" type="text"
+                        placeholder="Enter your tracking number">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>E-mail</label>
+                    <input class="form-control" name="email" id="email" type="text" placeholder="example@email.com">
+                </div>
+
+                <div class="card-footer border-secondary bg-transparent">
+                    <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Track
+                        Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100px">
+        <h3 class="font-weight-semi-bold text-uppercase mb-3">Your Order Status</h3>
+    </div>
+</div>
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="my-4">
+            <ul class="list-group" id="items">
+                Enter your order Id and Email and click Track Order to find details about your order!
+            </ul>
+        </div>
+        <div class="col-lg-8 table-responsive mb-5">
+
+            <table class="table table-bordered text-center mb-0">
+
+                <thead class="bg-secondary text-dark">
+
+                </thead>
+                <tbody class="align-middle">
+                    <tr>
+                        <td class="align-middle"></td>
+
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100px">
+        <h3 class="font-weight-semi-bold text-uppercase mb-3">Your Order Items</h3>
+    </div>
+
+</div>
+<ul class="row">
+        <li class="col-md-4" id="citems">
+            <figure class="itemside mb-3">
+                <div class="aside"><img src=" " class="img-sm border"></div>
+                <figcaption class="info align-self-center">
+                    <p class="title"> <br> </p> <span class="text-muted"> </span>
+                </figcaption>
+            </figure>
+        </li>
+    </ul>
+
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+
+    // if (localStorage.getItem('cart') == null) {
+    //     var cart = {};
+
+    // } else {
+    //     cart = JSON.parse(localStorage.getItem('cart'));
+
+    // }
+
+    $('#trackerForm').submit(function (event) {
+        $('#items').empty();
+        var formData = {
+            'orderid': $('input[name=orderid]').val(),
+            'email': $('input[name=email]').val(),
+
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/home/tracker/',
+            data: formData,
+            encode: true
+        })
+              .done(function(data) {
+            $('#citems').empty();
+            console.log(data)
+            data = JSON.parse(data);
+            if (data['status'] == 'success') {
+                updates = data['updates'];
+                for (i = 0; i < updates.length; i++) {
+                    let text = updates[i]['text'];
+                    let time = updates[i]['time'];
+                    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${text}
+                    <span class="badge badge-primary badge-pill">${time}</span>
+                </li>`
+                    $('#items').append(mystr);
+                }
+                // Fill in the order details
+                cart = JSON.parse(data['itemsJson']);
+                console.log(cart);
+                for (item in cart) {
+                    let name = cart[item][1];
+                    let qty = cart[item][0];
+                    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${name}
+                    <span class="badge badge-primary badge-pill">${qty}</span>
+                </li>`
+                    $('#citems').append(mystr);
+                }
+            } else {
+                mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    Sorry, We are not able to fetch this order id and email. Make sure to type correct order Id and email</li>`
+                $('#items').append(mystr);
+                $('#citems').append(mystr);
+            }
+        });
+        event.preventDefault();
+    });
+
+</script>
+<!--  -->
+
+{% endblock %}
