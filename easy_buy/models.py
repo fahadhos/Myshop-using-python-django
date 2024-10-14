@@ -30,7 +30,7 @@ class Product(models.Model):
 
 
 class Contact(models.Model):
-    msg_id = models.AutoField
+    msg_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default="")
     email = models.CharField(max_length=70, default="")
     phone = models.CharField(max_length=70, default="")
@@ -39,3 +39,28 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Order(models.Model):
+    order_id = models.AutoField(primary_key=True)
+    items_json = models.CharField(max_length=9000)
+    amount = models.IntegerField(default=0)
+    firstname = models.CharField(max_length=100)
+    lastname = models.CharField(max_length=100)
+    email = models.CharField(max_length=300)
+    phone = models.CharField(max_length=130)
+    address = models.CharField(max_length=2000)
+    country = models.CharField(max_length=500)
+    city = models.CharField(max_length=300)
+    state = models.CharField(max_length=300)
+    zip = models.CharField(max_length=300)
+
+
+class Orderupdate(models.Model):
+    update_id = models.AutoField(primary_key=True)
+    order_id = models.IntegerField(default="")
+    update_description = models.CharField(max_length=9000)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.update_description[0:49] + "..."
